@@ -60,7 +60,6 @@ export class Formatter {
         '',
       ];
     }
-
   }
 
   test(node: TestNode, fixtures: Set<string>, children: string[]) {
