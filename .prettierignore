@@ -1,5 +1,0 @@
-dist
-.features-gen
-.cache
-playwright-report
-**/*.md
