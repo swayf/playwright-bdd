@@ -42,13 +42,25 @@ export class Formatter {
 
   beforeEach(fixtures: Set<string>, children: string[]) {
     const fixturesStr = [...fixtures].join(', ');
-    // prettier-ignore
-    return [
-      `test.beforeEach(async ({ ${fixturesStr} }) => {`,
-      ...children.map(indent),
-      `});`,
-      '',
-    ];
+    if (!fixtures.has('featureHook')) {
+      // prettier-ignore
+      return [
+        `test.beforeEach(async ({ ${fixturesStr} }) => {`,
+        ...children.map(indent),
+        `});`,
+        '',
+      ];
+    } else {
+      // prettier-ignore
+      return [
+        `test.afterAll(async ({ featureHook, $testInfo })) => { return featureHook.afterAll($testInfo); });`,
+        `test.beforeEach(async ({ ${fixturesStr} }) => {`,
+        ...children.map(indent),
+        `});`,
+        '',
+      ];
+    }
+
   }
 
   test(node: TestNode, fixtures: Set<string>, children: string[]) {
