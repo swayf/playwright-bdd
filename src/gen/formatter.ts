@@ -42,24 +42,14 @@ export class Formatter {
 
   beforeEach(fixtures: Set<string>, children: string[]) {
     const fixturesStr = [...fixtures].join(', ');
-    if (!fixtures.has('featureHook')) {
-      // prettier-ignore
-      return [
-        `test.beforeEach(async ({ ${fixturesStr} }) => {`,
-        ...children.map(indent),
-        `});`,
-        '',
-      ];
-    } else {
-      // prettier-ignore
-      return [
-        `test.afterAll(async ({ featureHook, $testInfo })) => { return featureHook.afterAll($testInfo); });`,
-        `test.beforeEach(async ({ ${fixturesStr} }) => {`,
-        ...children.map(indent),
-        `});`,
-        '',
-      ];
-    }
+    // prettier-ignore
+    return [
+      `test.afterAll(async ({ $featureHook })) => { return $featureHook.afterAll(); });`,
+      `test.beforeEach(async ({ ${fixturesStr} }) => {`,
+      ...children.map(indent),
+      `});`,
+      '',
+    ];
   }
 
   test(node: TestNode, fixtures: Set<string>, children: string[]) {
@@ -88,11 +78,13 @@ export class Formatter {
   }
 
   technicalSection(testMetaBuilder: TestMetaBuilder, featureUri: string, fixtures: string[]) {
+
     return [
       '// == technical section ==', // prettier-ignore
       '',
       'test.use({',
       ...[
+        '$featureHook: ({}, use) => use({afterAll: async () => void 0}),',
         '$test: ({}, use) => use(test),',
         '$testMetaMap: ({}, use) => use(testMetaMap),',
         `$uri: ({}, use) => use(${this.quoted(featureUri)}),`,
