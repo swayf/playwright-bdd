@@ -44,7 +44,7 @@ export class Formatter {
     const fixturesStr = [...fixtures].join(', ');
     // prettier-ignore
     return [
-      `test.afterAll(async ({ $featureHook })) => { return $featureHook.afterAll(); });`,
+      `test.afterAll(async ({ $featureHook }) => { return $featureHook.afterAll(); });`,
       `test.beforeEach(async ({ ${fixturesStr} }) => {`,
       ...children.map(indent),
       `});`,
