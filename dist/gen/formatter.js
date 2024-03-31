@@ -33,14 +33,27 @@ class Formatter {
     }
     beforeEach(fixtures, children) {
         const fixturesStr = [...fixtures].join(', ');
-        // prettier-ignore
-        return [
-            `test.afterAll(async ({ $featureHook }) => { return $featureHook.afterAll(); });`,
-            `test.beforeEach(async ({ ${fixturesStr} }) => {`,
-            ...children.map(indent),
-            `});`,
-            '',
-        ];
+        const featureFixtures = [...fixtures].filter(n => n.startsWith('feature'));
+        if (!featureFixtures.length) {
+            // prettier-ignore
+            return [
+                `test.beforeEach(async ({ ${fixturesStr} }) => {`,
+                ...children.map(indent),
+                `});`,
+                '',
+            ];
+        }
+        else {
+            const featureFixturesStr = featureFixtures.join(', ');
+            // prettier-ignore
+            return [
+                `test.afterAll(async ({ $uri, $testInfo, ${featureFixturesStr} })) => { return Promise.all([${featureFixturesStr}].map(async f => f.afterAll?.($uri, $testInfo))); });`,
+                `test.beforeEach(async ({ ${fixturesStr} }) => {`,
+                ...children.map(indent),
+                `});`,
+                '',
+            ];
+        }
     }
     test(node, fixtures, children) {
         const fixturesStr = [...fixtures].join(', ');
@@ -70,7 +83,6 @@ class Formatter {
             '',
             'test.use({',
             ...[
-                '$featureHook: ({}, use) => use({afterAll: async () => void 0}),',
                 '$test: ({}, use) => use(test),',
                 '$testMetaMap: ({}, use) => use(testMetaMap),',
                 `$uri: ({}, use) => use(${this.quoted(featureUri)}),`,
