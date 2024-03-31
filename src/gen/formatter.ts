@@ -55,7 +55,7 @@ export class Formatter {
       const featureFixturesStr = featureFixtures.join(', ');
       // prettier-ignore
       return [
-        `test.afterAll(async ({ $uri, $testInfo, ${featureFixturesStr} })) => {
+        `test.afterAll(async ({ $uri, $testInfo, ${featureFixturesStr} }) => {
             return Promise.all([${featureFixturesStr}].map(async f => f.afterAll?.($uri, $testInfo))); 
         });`,
         `test.beforeEach(async ({ ${fixturesStr} }) => {`,
